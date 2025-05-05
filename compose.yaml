@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mysql
+    restart: always
+    env_file:
+      - ./laravel/.env
+    volumes:
+      - mysqldata:/var/lib/mysql
+    ports: 
+      - '3308:3306'
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  php:
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+  
+  spa:
+    build:
+      context: .
+      dockerfile: ./spa/Dockerfile
+    depends_on:
+      - php
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - '80:80'
+    depends_on:
+      - php
+      - db
+
+volumes:
+  mysqldata:

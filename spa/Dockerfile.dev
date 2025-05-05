@@ -1,0 +1,17 @@
+FROM node
+
+# set working dir
+WORKDIR /app
+
+# install deps
+COPY package*.json ./
+RUN npm install
+
+# mount source code
+COPY . .
+
+# for large projects on Docker Desktop, enable polling
+ENV CHOKIDAR_USEPOLLING=true
+
+# start React’s dev server
+CMD ["npm", "run", "dev"]
