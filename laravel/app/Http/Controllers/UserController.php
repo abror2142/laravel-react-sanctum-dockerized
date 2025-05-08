@@ -8,6 +8,6 @@ class UserController extends Controller
 {
     public function show()
     {
-        return auth()->user();
+        return auth()->user()->only(['id', 'name', 'email']);
     }
 }
